@@ -86,11 +86,15 @@ public class Planet{
 	}
 
 	public void update(double dt,double fX,double fY){
-		double aX = fX/mass;
-		xxVel = xxVel + aX*dt;
-		double aY = fY/mass;
-		yyVel = yyVel + aY*dt;
-		xxPos = xxPos + dt*xxVel;
-		yyPos = yyPos + dt*yyVel;
+		double aX = fX / mass;
+		xxVel = xxVel + aX * dt;
+		double aY = fY / mass;
+		yyVel = yyVel + aY * dt;
+		xxPos = xxPos + dt * xxVel;
+		yyPos = yyPos + dt * yyVel;
+	}
+
+	public void draw(){
+		StdDraw.picture(xxPos, yyPos, "images/" + imgFileName);
 	}
 }
