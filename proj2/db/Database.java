@@ -22,7 +22,8 @@ public class Database {
                                  DROP_CMD   = Pattern.compile("drop table " + REST),
                                  INSERT_CMD = Pattern.compile("insert into " + REST),
                                  PRINT_CMD  = Pattern.compile("print " + REST),
-                                 SELECT_CMD = Pattern.compile("select " + REST);
+                                 SELECT_CMD = Pattern.compile("select " + REST),
+                                 UPDATE_CMD = Pattern.compile("update " + REST);
 
     // Stage 2 syntax, contains the clauses of commands.
     private static final Pattern CREATE_NEW  = Pattern.compile("(\\S+)\\s+\\(\\s*(\\S+\\s+\\S+\\s*" + "(?:,\\s*\\S+\\s+\\S+\\s*)*)\\)"),
@@ -31,7 +32,11 @@ public class Database {
                                          "([\\w\\s+\\-*/'<>=!.]+?(?:\\s+and\\s+" +
                                          "[\\w\\s+\\-*/'<>=!.]+?)*))?"),
                                  CREATE_SEL  = Pattern.compile("(\\S+)\\s+as select\\s+" + SELECT_CLS.pattern()),
-                                 INSERT_CLS  = Pattern.compile("(\\S+)\\s+values\\s+(.+?" + "\\s*(?:,\\s*.+?\\s*)*)");
+                                 INSERT_CLS  = Pattern.compile("(\\S+)\\s+values\\s+(.+?" + "\\s*(?:,\\s*.+?\\s*)*)"),
+                                 UPDATE_SET  = Pattern.compile("(\\S+)\\s+set\\s+[^,]+?\\s+[=]{1}\\s+" +
+                                         Table.LITERALS_REGEX + "\\s+where\\s+" +
+                                         "([\\w\\s+\\-*/'<>=!.]+?(?:\\s+and\\s+" +
+                                         "[\\w\\s+\\-*/'<>=!.]+?)*)?");
 
 
     private String name = "xx";
@@ -215,6 +220,23 @@ public class Database {
         }
     }
 
+    private void Update (String s) throws RuntimeException {
+        if(!UPDATE_SET.matcher(s).matches()) {
+            throw new RuntimeException("ERROR: Invalid UPDATE_SET command: " + s);
+        }
+        String[] strings = s.split("(\\s{1}set\\s{1}|\\s{1}where\\s{1})");
+        String tableName = strings[0];
+        String setExpression  = strings[1];
+
+        String conStates = strings[2];
+        String[] conditionalStatements = conStates.split(AND);
+        conState[] conStatesInstance = new conState[conditionalStatements.length];
+        for(int i = 0; i < conStatesInstance.length; i ++) {
+            conStatesInstance[i] = new conState(conditionalStatements[i]);
+        }
+        getTable(tableName).updateSetTable(setExpression, conStatesInstance);
+    }
+
     private void eval(String query) throws RuntimeException{
         query = query.replaceAll(" +", " ");
         Matcher m;
@@ -233,6 +255,8 @@ public class Database {
         } else if ((m = SELECT_CMD.matcher(query)).matches()) {
             Table selectResult = Select(m.group(1));
             selectResult.printTable();
+        } else if ((m = UPDATE_CMD.matcher(query)).matches()){
+            Update(m.group(1));
         } else {
             throw new RuntimeException("Malformed query: "+ query);
         }
