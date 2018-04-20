@@ -1,3 +1,5 @@
+import lab14lib.Generator;
+
 public class SineWaveGenerator implements Generator {
 	private double frequency;
 	private int state;	

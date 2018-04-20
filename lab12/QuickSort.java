@@ -35,18 +35,18 @@ public class QuickSort {
     /**
      * Partitions the given unsorted queue by pivoting on the given item.
      *
-     * @param unsorted a Queue of unsorted items
-     * @param pivot the item to pivot on
-     * @param less an empty Queue. When the function completes, this queue will contain
-     *             all of the items in unsorted that are less than the given pivot.
-     * @param equal an empty Queue. When the function completes, this queue will contain
-     *              all of the items in unsorted that are equal to the given pivot.
-     * @param greater an empty Queue. When the function completes, this queue will contain
-     *                all of the items in unsorted that are greater than the given pivot.
+     * @param unsorted  A Queue of unsorted items
+     * @param pivot     The item to pivot on
+     * @param less      An empty Queue. When the function completes, this queue will contain
+     *                  all of the items in unsorted that are less than the given pivot.
+     * @param equal     An empty Queue. When the function completes, this queue will contain
+     *                  all of the items in unsorted that are equal to the given pivot.
+     * @param greater   An empty Queue. When the function completes, this queue will contain
+     *                  all of the items in unsorted that are greater than the given pivot.
      */
     private static <Item extends Comparable> void partition(
-            Queue<Item> unsorted, Item pivot, Queue<Item> less,
-            Queue<Item> equal, Queue<Item> greater) {
+            Queue<Item> unsorted, Item pivot,
+            Queue<Item> less, Queue<Item> equal, Queue<Item> greater) {
         // Your code here!
     }
 

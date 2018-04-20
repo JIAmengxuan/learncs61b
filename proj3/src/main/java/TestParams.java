@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * TestParams fully describes the inputs and expected outputs for test cases.
  * After being generated (test-case autogeneration code not shown in this file),
- * this information is serialized for testing.
+ * this information is serialized for testing. You should not modify this file.
  * @author Alan Yao
  */
 public class TestParams implements Serializable {

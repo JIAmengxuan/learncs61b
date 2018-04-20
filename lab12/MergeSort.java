@@ -7,9 +7,9 @@ public class MergeSort {
      * The method assumes that both q1 and q2 are in sorted order, with the smallest item first. At
      * most one of q1 or q2 can be empty (but both cannot be empty).
      *
-     * @param q1 A Queue in sorted order from least to greatest.
-     * @param q2 A Queue in sorted order from least to greatest.
-     * @return The smallest item that is in q1 or q2.
+     * @param   q1  A Queue in sorted order from least to greatest.
+     * @param   q2  A Queue in sorted order from least to greatest.
+     * @return      The smallest item that is in q1 or q2.
      */
     private static <Item extends Comparable> Item getMin(
             Queue<Item> q1, Queue<Item> q2) {
@@ -45,10 +45,10 @@ public class MergeSort {
      * running this method, q1 and q2 will be empty, and all of their items will be in the
      * returned queue.
      *
-     * @param q1 A Queue in sorted order from least to greatest.
-     * @param q2 A Queue in sorted order from least to greatest.
-     * @returns A Queue containing all of the q1 and q2 in sorted order, from least to
-     *     greatest.
+     * @param   q1  A Queue in sorted order from least to greatest.
+     * @param   q2  A Queue in sorted order from least to greatest.
+     * @return      A Queue containing all of the q1 and q2 in sorted order, from least to
+     *              greatest.
      *
      */
     private static <Item extends Comparable> Queue<Item> mergeSortedQueues(

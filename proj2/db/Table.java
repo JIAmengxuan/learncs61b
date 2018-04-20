@@ -2,11 +2,9 @@ package db;
 
 import edu.princeton.cs.introcs.In;
 import edu.princeton.cs.introcs.Out;
+import sun.awt.image.ImageWatched;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -16,10 +14,13 @@ public class Table implements Cloneable{
     //换行(\n)，逗号(,)，的正则表达式
     private static final String NEWLINE = "\\s*\\n",
                                   COMMA = "\\s*,\\s*";
-    //String, int, float类型的正则表达式
+    //String, int, float类型字面值的正则表达式
     private static final String STRING_REGEX = "('.+')|(NOVALUE)",
                                 INT_REGEX    = "-?\\d+",
                                 FLOAT_REGEX  = "(-?\\d+\\.\\d+)|(NaN)";
+
+    //字面值的正则表达式
+    static final String LITERALS_REGEX = "(" + STRING_REGEX +"|"+ INT_REGEX +"|"+ FLOAT_REGEX + ")";
 
     //String, int, float类型的Pattern对象
     private static final Pattern STRING_PATTERN = Pattern.compile(STRING_REGEX),
@@ -113,7 +114,7 @@ public class Table implements Cloneable{
         if(INT_PATTERN.matcher(s).matches())
             return Integer.parseInt(s);
         else
-            throw new RuntimeException("ERROR: Invalid changeType.");
+            throw new RuntimeException("ERROR: Invalid literals Type.");
     }
 
     private boolean matchType (String[] literals) throws RuntimeException {
@@ -409,45 +410,36 @@ public class Table implements Cloneable{
         }
 
         if(conStates != null) {
-            LinkedList<Integer> conStatesResult = new LinkedList<>();
-            for (conState conState : conStates) {
-                switch (conState.result) {
-                    case "BINARY":
-                        conStatesResult.addAll(conState.colCom.compare(resultOfSelect.getColumn(conState.cols[0]), resultOfSelect.getColumn(conState.cols[1])));
-                        break;
-
-                    case "UNARY":
-                        LinkedList<Integer> indexToAdd;
-                        if (conState.cols[1].matches(INT_REGEX + "|" + FLOAT_REGEX)) {
-                            indexToAdd = conState.colCom.compare(resultOfSelect.getColumn(conState.cols[0]), (Number) Table.changeType(conState.cols[1]));
-                        } else {
-                            indexToAdd = conState.colCom.compare(resultOfSelect.getColumn(conState.cols[0]), (String) Table.changeType(conState.cols[1]));
-                        }
-                        conStatesResult.addAll(indexToAdd);
-                        break;
-                }
-            }
-
-            //conStatesResult中重复次数为条件个数的元素即为conditional statements选择的结果；
-            HashMap<Integer, Integer> hashMap = new HashMap<>();
-            for (Integer i : conStatesResult) {
-                if (hashMap.containsKey(i)) {
-                    Integer value = hashMap.get(i) + 1;
-                    hashMap.put(i, value);
-                } else {
-                    hashMap.put(i, 1);
-                }
-            }
-            conStatesResult.clear();
-            for (HashMap.Entry<Integer, Integer> entry : hashMap.entrySet()) {
-                if (entry.getValue().equals(conStates.length)) {
-                    conStatesResult.add(entry.getKey());
-                }
-            }
-
+            LinkedList<Integer> conStatesResult = resultOfSelect.conStatesResult(conStates);
             resultOfSelect.resetTableByRowNums(conStatesResult);
         }
         return resultOfSelect;
+    }
+
+    void updateSetTable(String setExp, conState[] conStates) {
+        LinkedList<Integer> conStatesResult = conStatesResult(conStates);
+        String[] colNameAndLiteral = setExp.trim().split("(\\=){1}");
+        String colName = colNameAndLiteral[0].trim();
+        String literal = colNameAndLiteral[1].trim();
+
+        for(Integer index : conStatesResult) {
+            getColumn(colName).set(index, changeType(literal));
+        }
+    }
+
+    void deleteFromTable(conState[] conStates) {
+        LinkedList<Integer> conStatesResult = conStatesResult(conStates);
+        rowNum = rowNum - conStatesResult.size();
+
+        /*需要先对conStatesResult做从大到小的排序，才可按index删除,
+        /*因为conStateResult存的是重复的列数有小到大的顺序，所以只需将链表反转即可；
+         */
+        conStatesResult.sort(Comparator.reverseOrder());
+        for(Column col : columns) {
+            for(Integer index : conStatesResult) {
+                col.remove(index);
+            }
+        }
     }
 
     private void resetTableByRowNums(LinkedList<Integer> rowNums) {
@@ -455,5 +447,44 @@ public class Table implements Cloneable{
             col.resetColByRowNums(rowNums);
         }
         rowNum = rowNums.size();
+    }
+
+    private LinkedList<Integer> conStatesResult (conState[] conStates) {
+        LinkedList<Integer> conStatesResult = new LinkedList<>();
+        for (conState conState : conStates) {
+            switch (conState.result) {
+                case "BINARY":
+                    conStatesResult.addAll(conState.colCom.compare(getColumn(conState.cols[0]), getColumn(conState.cols[1])));
+                    break;
+
+                case "UNARY":
+                    LinkedList<Integer> indexToAdd;
+                    if (conState.cols[1].matches(INT_REGEX + "|" + FLOAT_REGEX)) {
+                        indexToAdd = conState.colCom.compare(getColumn(conState.cols[0]), (Number) Table.changeType(conState.cols[1]));
+                    } else {
+                        indexToAdd = conState.colCom.compare(getColumn(conState.cols[0]), (String) Table.changeType(conState.cols[1]));
+                    }
+                    conStatesResult.addAll(indexToAdd);
+                    break;
+            }
+        }
+
+        //conStatesResult中重复次数为条件个数的元素即为conditional statements选择的结果；
+        HashMap<Integer, Integer> hashMap = new HashMap<>();
+        for (Integer i : conStatesResult) {
+            if (hashMap.containsKey(i)) {
+                Integer value = hashMap.get(i) + 1;
+                hashMap.put(i, value);
+            } else {
+                hashMap.put(i, 1);
+            }
+        }
+        conStatesResult.clear();
+        for (HashMap.Entry<Integer, Integer> entry : hashMap.entrySet()) {
+            if (entry.getValue().equals(conStates.length)) {
+                conStatesResult.add(entry.getKey());
+            }
+        }
+        return conStatesResult;
     }
 }

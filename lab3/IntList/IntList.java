@@ -1,3 +1,5 @@
+package IntList;
+
 import java.util.ArrayList;
 import java.util.Formatter;
 
@@ -43,7 +45,7 @@ public class IntList {
             L = L.tail;
         }
     }
-ArrayList
+//ArrayList
     /**
      * Returns a list equal to L with all elements squared. Non-destructive.
      */
@@ -211,6 +213,26 @@ ArrayList
         }
         out.format(")");
         return out.toString();
+    }
+
+    /**
+     * Returns the reverse of the given IntList.
+     * This method is destructive. If given null
+     * as an input, returns null.
+     */
+    public static IntList reverse(IntList A) {
+        if(A == null) return null;
+        IntList headOfReversed, temp, unReversed;
+        headOfReversed = null;//注意!!
+        unReversed = A;
+
+        while(unReversed != null) {
+            temp = unReversed;
+            unReversed = unReversed.tail;
+            temp.tail = headOfReversed;
+            headOfReversed = temp;
+        }
+        return headOfReversed;
     }
 }
 

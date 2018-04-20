@@ -30,19 +30,8 @@ public class lessThan implements ColumnComparison {
             throw new RuntimeException("ERROR: Can't compare " + col.columnNameType + " with " + num.toString());
         } else {
             for(int i = 0; i < col.size(); i++ ) {
-                Object data = col.get(i);
-                Float numData;
-                Float fNum;
-                if(col.columnType.equals(Integer.class)) {
-                    numData = ((Integer) data).floatValue();
-                } else {
-                    numData = (Float) data;
-                }
-                if(num.getClass().equals(Integer.class)) {
-                    fNum = num.floatValue();
-                } else {
-                    fNum = (Float) num;
-                }
+                Float numData = ((Number) col.get(i)).floatValue();
+                Float fNum = num.floatValue();
                 if(numData.compareTo(fNum) < 0) {
                     rowIndexOfCol.addLast(i);
                 }
@@ -69,18 +58,8 @@ public class lessThan implements ColumnComparison {
                 }
             } else {
                 for(int i = 0; i < col1.size(); i++) {
-                    Float col1Data;
-                    Float col2Data;
-                    if(col1.columnType.equals(Integer.class)) {
-                        col1Data = ((Integer) col1.get(i)).floatValue();
-                    } else {
-                        col1Data = (Float) col1.get(i);
-                    }
-                    if(col2.columnType.equals(Integer.class)) {
-                        col2Data = ((Integer) col2.get(i)).floatValue();
-                    } else {
-                        col2Data = (Float) col2.get(i);
-                    }
+                    Float col1Data = ((Number) col1.get(i)).floatValue();
+                    Float col2Data = ((Number) col2.get(i)).floatValue();
                     if(col1Data.compareTo(col2Data) < 0) {
                         rowIndexOfCol.addLast(i);
                     }

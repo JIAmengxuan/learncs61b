@@ -15,7 +15,9 @@ public class multiplyColumn implements ColumnOperator {
                 Iterator iterator_c1 = c1.columnData.iterator();
                 Iterator iterator_c2 = c2.columnData.iterator();
                 while (iterator_c1.hasNext() && iterator_c2.hasNext()) {
-                    result.addLast((Float) iterator_c1.next() * (Float) iterator_c2.next());
+                    Float col1Data = ((Number) iterator_c1.next()).floatValue();
+                    Float col2Data = ((Number) iterator_c2.next()).floatValue();
+                    result.addLast(col1Data * col2Data);
                 }
                 return result;
             } else {
@@ -48,6 +50,7 @@ public class multiplyColumn implements ColumnOperator {
                 Column result = new Column(" float", Float.class);
 
                 for (Object value: col.columnData){
+                    value = ((Number) value).floatValue();
                     result.addLast((Float) value * (Float) n);
                 }
                 return result;

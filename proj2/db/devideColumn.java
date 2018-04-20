@@ -16,16 +16,16 @@ public class devideColumn implements ColumnOperator {
                 Iterator iterator_c1 = c1.columnData.iterator();
                 Iterator iterator_c2 = c2.columnData.iterator();
                 while (iterator_c1.hasNext() && iterator_c2.hasNext()) {
-                    Number tmp1 = (Number) iterator_c1.next();
-                    Number tmp2 = (Number) iterator_c2.next();
-                    if(tmp2.equals(0.0f) || tmp2.equals(0)) {
-                        if(tmp1.equals(0.0f) || tmp1.equals(0)) {
+                    Float tmp1 = ((Number) iterator_c1.next()).floatValue();
+                    Float tmp2 = ((Number) iterator_c2.next()).floatValue();
+                    if(tmp2.equals(0.0f)) {
+                        if(tmp1.equals(0.0f)) {
                             result.addLast(0.0f);
                         } else {
                             result.addLast(NaN);
                         }
                     } else {
-                        result.addLast((Float) tmp1 / (Float) tmp2);
+                        result.addLast( tmp1 / tmp2);
                     }
                 }
                 return result;
@@ -67,18 +67,19 @@ public class devideColumn implements ColumnOperator {
             if (col.columnType == Float.class || n.getClass() == Float.class) {
                 //至少有一个操作数是<Float>
                 Column result = new Column(" float", Float.class);
+                n = n.floatValue();
 
                 Iterator iterator = col.columnData.iterator();
                 while (iterator.hasNext()) {
-                    Number tmp = (Number) iterator.next();
-                    if(n.equals(0) || n.equals(0.0f)) {
-                        if(tmp.equals(0) || tmp.equals(0)) {
+                    Float tmp = ((Number) iterator.next()).floatValue();
+                    if(n.equals(0.0f)) {
+                        if(tmp.equals(0.0f)) {
                             result.addLast(0.0f);
                         } else {
                             result.addLast(NaN);
                         }
                     } else {
-                        result.addLast((Float) tmp / (Float) n);
+                        result.addLast(tmp / (Float) n);
                     }
                 }
                 return result;

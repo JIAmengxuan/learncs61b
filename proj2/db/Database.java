@@ -23,6 +23,7 @@ public class Database {
                                  INSERT_CMD = Pattern.compile("insert into " + REST),
                                  PRINT_CMD  = Pattern.compile("print " + REST),
                                  SELECT_CMD = Pattern.compile("select " + REST),
+                                 DELETE_CMD = Pattern.compile("delete from " + REST),
                                  UPDATE_CMD = Pattern.compile("update " + REST);
 
     // Stage 2 syntax, contains the clauses of commands.
@@ -33,10 +34,12 @@ public class Database {
                                          "[\\w\\s+\\-*/'<>=!.]+?)*))?"),
                                  CREATE_SEL  = Pattern.compile("(\\S+)\\s+as select\\s+" + SELECT_CLS.pattern()),
                                  INSERT_CLS  = Pattern.compile("(\\S+)\\s+values\\s+(.+?" + "\\s*(?:,\\s*.+?\\s*)*)"),
-                                 UPDATE_SET  = Pattern.compile("(\\S+)\\s+set\\s+[^,]+?\\s+[=]{1}\\s+" +
-                                         Table.LITERALS_REGEX + "\\s+where\\s+" +
-                                         "([\\w\\s+\\-*/'<>=!.]+?(?:\\s+and\\s+" +
-                                         "[\\w\\s+\\-*/'<>=!.]+?)*)?");
+                                 UPDATE_SET  = Pattern.compile("(\\S+)\\s+set\\s+[^,]+?\\s+=\\s+" +
+                                         Table.LITERALS_REGEX + "(?:\\s+where\\s+" +
+                                         "[\\w\\s+\\-*/'<>=!.]+?(?:\\s+and\\s+" +
+                                         "[\\w\\s+\\-*/'<>=!.]+?)*)"),
+                                DELETE_WHERE = Pattern.compile("(\\S)+\\s+where+\\s+([\\w\\s+\\-*/'<>=!.]+?(?:\\s+and\\s+" +
+                                         "[\\w\\s+\\-*/'<>=!.]+?)*)");
 
 
     private String name = "xx";
@@ -126,7 +129,7 @@ public class Database {
         //在Database_xx.tbl中更新上tableName；
         In in = new In("C:\\Users\\John\\IdeaProjects\\cs61b\\learncs61b\\learncs61b\\proj2\\examples\\Database_" + name + ".tbl");
         String TablesName = in.readAll();
-        TablesName = TablesName + "\n" + tableName;
+        TablesName = TablesName + '\n' + tableName;
         Out out = new Out("C:\\Users\\John\\IdeaProjects\\cs61b\\learncs61b\\learncs61b\\proj2\\examples\\Database_" + name + ".tbl");
         out.print(TablesName);
     }
@@ -140,17 +143,17 @@ public class Database {
         if(!tables.containsKey(tableName))
             throw new RuntimeException("ERROR: " + tableName + " is not in Database.");
 
+        tables.remove(tableName);
         while(eachTableName != null) {
             if(eachTableName.equals(tableName)) {
                 eachTableName = in.readLine();
-            }
-            else {
-                TablesName = TablesName + eachTableName + "\n";
+            } else {
+                TablesName = TablesName + eachTableName + '\n';
                 eachTableName = in.readLine();
             }
         }
         Out out = new Out("C:\\Users\\John\\IdeaProjects\\cs61b\\learncs61b\\learncs61b\\proj2\\examples\\Database_" + name + ".tbl");
-        out.print(TablesName);
+        out.print(TablesName.trim());
     }
 
     private void insertInto(String tableNameAndLiterals) throws RuntimeException {
@@ -225,7 +228,7 @@ public class Database {
             throw new RuntimeException("ERROR: Invalid UPDATE_SET command: " + s);
         }
         String[] strings = s.split("(\\s{1}set\\s{1}|\\s{1}where\\s{1})");
-        String tableName = strings[0];
+        String tableName = strings[0].trim();
         String setExpression  = strings[1];
 
         String conStates = strings[2];
@@ -235,6 +238,22 @@ public class Database {
             conStatesInstance[i] = new conState(conditionalStatements[i]);
         }
         getTable(tableName).updateSetTable(setExpression, conStatesInstance);
+    }
+
+    private void Delete (String s) throws RuntimeException {
+        if(!DELETE_WHERE.matcher(s).matches()) {
+            throw new RuntimeException("ERROR: Invalid DELETE command: " + s);
+        }
+        String[] strings = s.split("\\s+where\\s+");
+        String tableName = strings[0].trim();
+        String conStates = strings[1].trim();
+
+        String[] conditionalStatements = conStates.split(AND);
+        conState[] conStatesInstance = new conState[conditionalStatements.length];
+        for(int i = 0; i < conStatesInstance.length; i ++) {
+            conStatesInstance[i] = new conState(conditionalStatements[i]);
+        }
+        getTable(tableName).deleteFromTable(conStatesInstance);
     }
 
     private void eval(String query) throws RuntimeException{
@@ -257,7 +276,9 @@ public class Database {
             selectResult.printTable();
         } else if ((m = UPDATE_CMD.matcher(query)).matches()){
             Update(m.group(1));
-        } else {
+        } else if ((m = DELETE_CMD.matcher(query)).matches()) {
+            Delete(m.group(1));
+        } else{
             throw new RuntimeException("Malformed query: "+ query);
         }
     }

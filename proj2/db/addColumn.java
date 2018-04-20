@@ -1,5 +1,7 @@
 package db;
 
+import jh61b.junit.In;
+
 import java.util.Iterator;
 
 /**
@@ -19,7 +21,10 @@ public class addColumn implements ColumnOperator {
                     Iterator iterator_c1 = c1.columnData.iterator();
                     Iterator iterator_c2 = c2.columnData.iterator();
                     while(iterator_c1.hasNext() && iterator_c2.hasNext()) {
-                        result.addLast((Float)iterator_c1.next() + (Float)iterator_c2.next());
+                        //子类是可以cast成父类的，只不过会丢掉一些属性。
+                        Float num1 = ((Number) iterator_c1.next()).floatValue();
+                        Float num2 = ((Number) iterator_c2.next()).floatValue();
+                        result.addLast( num1 + num2);
                     }
                     return result;
                 } else {
@@ -89,9 +94,11 @@ public class addColumn implements ColumnOperator {
             if (col.columnType.equals(Float.class) || n.getClass() == Float.class) {
                 //至少有一个是column<Float>
                 Column result = new Column(" float", Float.class);
-
                 for(Object value : col.columnData) {
-                    result.addLast((Float) value + (Float) n);
+                    if(value.getClass().equals(Integer.class)) {
+                        value = ((Integer) value).floatValue();
+                    }
+                    result.addLast((Float) value + n.floatValue());
                 }
                 return result;
             } else {

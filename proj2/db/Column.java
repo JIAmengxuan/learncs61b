@@ -63,6 +63,14 @@ class Column implements Cloneable{
         columnData.clear();
     }
 
+    void remove(int index) {
+        columnData.remove(index);
+    }
+
+    void set(int index, Object literal) {
+        columnData.set(index, literal);
+    }
+
 
     Integer size() {
         return columnData.size();

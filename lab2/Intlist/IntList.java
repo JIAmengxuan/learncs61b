@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Formatter;
 
 /**
@@ -42,7 +43,7 @@ public class IntList {
             L = L.tail;
         }
     }
-
+ArrayList
     /**
      * Returns a list equal to L with all elements squared. Non-destructive.
      */

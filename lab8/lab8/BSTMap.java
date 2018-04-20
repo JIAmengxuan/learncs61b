@@ -116,9 +116,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B <K, V>, Iterab
 
     private class BSTMapIter implements Iterator<K> {
         private BST cur;
+        LinkedList<BST> stack = new LinkedList<>();
 
         BSTMapIter() {
             cur = rootOfBST;
+            while(cur != null) {
+                stack.push(cur);
+                cur = cur.left;
+            }
         }
 
         @Override
@@ -128,9 +133,19 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B <K, V>, Iterab
 
         @Override
         public K next() {
-            K ret = cur.key;
+            K ret = null;
+            while(cur != null || !stack.isEmpty()) {
+                while(cur != null) {
+                    stack.push(cur);
+                    cur = cur.left;
+                }
+                cur = stack.pop();
+                ret = cur.key;
+                cur = cur.right;
+                if(ret == null)
+                    break;
 
-
+            }
             return ret;
         }
 

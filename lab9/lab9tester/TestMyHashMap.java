@@ -95,6 +95,52 @@ public class TestMyHashMap {
         assertTrue(keySet.containsAll(values));
     }
 
+    /*
+     * Test for general functionality and that the properties of Maps hold.
+     */
+    @Test
+    public void functionalityTest() {
+        MyHashMap<String, String> dictionary = new MyHashMap<>();
+        assertEquals(0, dictionary.size());
+
+        // can put objects in dictionary and get them
+        dictionary.put("hello", "world");
+        assertTrue(dictionary.containsKey("hello"));
+        assertEquals("world", dictionary.get("hello"));
+        assertEquals(1, dictionary.size());
+
+        // putting with existing key updates the value
+        dictionary.put("hello", "kevin");
+        assertEquals(1, dictionary.size());
+        assertEquals("kevin", dictionary.get("hello"));
+
+        // putting key in multiple times does not affect behavior
+        MyHashMap<String, Integer> studentIDs = new MyHashMap<>();
+        studentIDs.put("sarah", 12345);
+        assertEquals(1, studentIDs.size());
+        assertEquals(12345, studentIDs.get("sarah").intValue());
+        studentIDs.put("alan", 345);
+        assertEquals(2, studentIDs.size());
+        assertEquals(12345, studentIDs.get("sarah").intValue());
+        assertEquals(345, studentIDs.get("alan").intValue());
+        studentIDs.put("alan", 345);
+        assertEquals(2, studentIDs.size());
+        assertEquals(12345, studentIDs.get("sarah").intValue());
+        assertEquals(345, studentIDs.get("alan").intValue());
+        studentIDs.put("alan", 345);
+        assertEquals(2, studentIDs.size());
+        assertEquals(12345, studentIDs.get("sarah").intValue());
+        assertEquals(345, studentIDs.get("alan").intValue());
+        assertTrue(studentIDs.containsKey("sarah"));
+        assertTrue(studentIDs.containsKey("alan"));
+
+        // handle values being the same
+        assertEquals(345, studentIDs.get("alan").intValue());
+        studentIDs.put("evil alan", 345);
+        assertEquals(345, studentIDs.get("evil alan").intValue());
+        assertEquals(studentIDs.get("evil alan"), studentIDs.get("alan"));
+    }
+
     public static void main(String[] args) {
         jh61b.junit.TestRunner.runTests(TestMyHashMap.class);
     }

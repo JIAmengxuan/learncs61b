@@ -13,7 +13,7 @@ public class columnExpr {
     // 则(普通\)d变不会被java字符串识别为转义，则传递到正则识别时即为\d，此时将\d识别为正则中的特殊符号，达到目的。
     private static final Pattern operator_PATTERN      = Pattern.compile("([+]|[-]|[*]|[/])"),
                                  alias_PATTERN         = Pattern.compile("(as){1}"),
-                                 ALL_COLUMN_PATTERN    = Pattern.compile("[*]\\s+"),
+                                 ALL_COLUMN_PATTERN    = Pattern.compile("\\s?\\*\\s?"),
                                  singleOperand_PATTERN = Pattern.compile("([^*]+\\s?){1}"),
                                  twoOperand_PATTERN    = Pattern.compile(".+\\s?([+]|[-]|[*]|[/])\\s?.+\\s?(as)\\s?.+");
 

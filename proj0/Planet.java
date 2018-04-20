@@ -79,7 +79,7 @@ public class Planet{
 		double fYnet = 0;
 		for(int i = 0; i < p.length; i++){
 			if(this.equals(p[i]) == false){
-				fYnet += this.calcForceExertedByY(p[i]);	
+				fYnet += this.calcForceExertedByY(p[i]);
 			}			
 		}
 		return fYnet;
