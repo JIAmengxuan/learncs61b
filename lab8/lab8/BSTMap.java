@@ -142,7 +142,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B <K, V>, Iterab
                 cur = stack.pop();
                 ret = cur.key;
                 cur = cur.right;
-                if(ret == null)
+                if(ret != null)
                     break;
 
             }
