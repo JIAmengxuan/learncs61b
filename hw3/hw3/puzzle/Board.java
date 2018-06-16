@@ -96,7 +96,7 @@ public class Board implements WorldState{
     public int manhattan() {
         int man = 0;
         for(int i = 0; i < size; i++) {
-            if(values[i] != i) {
+            if(values[i] != i + 1) {
                 int trueX = values[i] < N ? 0 : values[i] / N;
                 int trueY = values[i] < N ? values[i] : values[i] % N;
                 int curX = i < N ? 0 : i / N;
@@ -135,6 +135,15 @@ public class Board implements WorldState{
             return check;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int res = 0;
+        for(int i : values) {
+            res = res * 31 + i;
+        }
+        return res;
     }
 
     /** Returns the string representation of the board.

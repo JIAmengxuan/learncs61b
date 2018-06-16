@@ -2,7 +2,11 @@ package hw3.puzzle;
 
 import edu.princeton.cs.algs4.MinPQ;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
 
 /**
  Solver(initial): Constructor which solves the puzzle, computing
@@ -16,8 +20,9 @@ import java.util.*;
  */
 public class Solver {
     private MinPQ<searchNode> pq;
+    Set<WorldState> mark;
 
-    class searchNode implements Iterable<WorldState> {
+    class searchNode implements Iterable<WorldState>{
         int moves;
         searchNode pre;
         WorldState value;
@@ -27,7 +32,7 @@ public class Solver {
             value = init;
             pre = father;
             moves = m;
-            priority = moves + init.estimatedDistanceToGoal();
+            priority = moves + value.estimatedDistanceToGoal();
         }
 
         @Override
@@ -60,19 +65,23 @@ public class Solver {
         pq = new MinPQ<>(
                 (sn1, sn2) -> (sn1.priority - sn2.priority)
         );
+        mark = new HashSet<>();
 
         pq.insert(new searchNode(initial, null, 0));
+        mark.add(initial);
         while(!pq.min().value.isGoal()) {
             searchNode cur = pq.delMin();
             for(WorldState ws : cur.value.neighbors()) {
-                if(cur.pre == null || !ws.equals(cur.pre.value)) {
+                if(!mark.contains(ws)) {
                     searchNode child = new searchNode(ws, cur, cur.moves + 1);
                     pq.insert(child);
+                    mark.add(child.value);
                 }
             }
         }
 
     }
+
     public int moves() {
         return pq.min().moves;
     }
