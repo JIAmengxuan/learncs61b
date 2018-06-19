@@ -12,7 +12,7 @@ public class MazeBreadthFirstPaths extends MazeExplorer {
     public int[] edgeTo;
     public boolean[] marked;
     */
-    private Queue<Integer> pq;
+    private Queue<Integer> fringe;
     private int sID;
     private int tID;
     private Maze maze;
@@ -23,38 +23,40 @@ public class MazeBreadthFirstPaths extends MazeExplorer {
         // Add more variables here!
         sID = maze.xyTo1D(sourceX, sourceY);
         tID = maze.xyTo1D(targetX, targetY);
-        distTo[sID] = 0;
-        edgeTo[sID] = sID;
-        pq = new PriorityQueue<>(
-                (i1, i2) -> (distTo[i1] - distTo[i2]));
-        pq.offer(sID);
-        marked[sID] = true;
+        fringe = new PriorityQueue<>(
+                (i1, i2) -> (distTo[i1] - distTo[i2])
+        );
     }
 
     /** Conducts a breadth first search of the maze starting at the source. */
-    private void bfs() {
-        // TODO: Your code here. Don't forget to update distTo, edgeTo, and marked, as well as call announce()
-        if(!pq.isEmpty()) {
-            int curID = pq.poll();
-            announce();
+    private void bfs(int sourceNode) {
+        fringe.offer(sourceNode);
+        marked[sourceNode] = true;
+        distTo[sourceNode] = 0;
+        edgeTo[sourceNode] = 0;
+        announce();
+
+        while(!fringe.isEmpty()) {
+            int curID = fringe.poll();
+
             if(curID == tID) return;
 
             for(int child : maze.adj(curID)) {
                 if(!marked[child]) {
                     edgeTo[child] = curID;
                     distTo[child] = distTo[curID] + 1;
-                    pq.offer(child);
+                    fringe.offer(child);
                     marked[child] = true;
+                    announce();
                 }
             }
         }
-        bfs();
     }
 
 
     @Override
     public void solve() {
-        bfs();
+        bfs(sID);
     }
 }
 

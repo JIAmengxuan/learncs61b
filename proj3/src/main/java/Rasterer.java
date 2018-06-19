@@ -8,19 +8,15 @@ import java.util.Map;
  * not draw the output correctly.
  */
 public class Rasterer {
-    // Recommended: QuadTree instance variable. You'll need to make
-    //              your own QuadTree since there is no built-in quadtree in Java.
 
-    /** imgRoot is the name of the directory containing the images.
-     *  You may not actually need this for your class. */
-    public Rasterer(String imgRoot) {
+    public Rasterer() {
         // YOUR CODE HERE
     }
 
     /**
      * Takes a user query and finds the grid of images that best matches the query. These
      * images will be combined into one big image (rastered) by the front end. <br>
-     * <p>
+     *
      *     The grid of images must obey the following properties, where image in the
      *     grid is referred to as a "tile".
      *     <ul>
@@ -31,22 +27,19 @@ public class Rasterer {
      *         above condition.</li>
      *         <li>The tiles must be arranged in-order to reconstruct the full image.</li>
      *     </ul>
-     * </p>
+     *
      * @param params Map of the HTTP GET request's query parameters - the query box and
      *               the user viewport width and height.
      *
-     * @return A map of results for the front end as specified:
-     * "render_grid"   -> String[][], the files to display
-     * "raster_ul_lon" -> Number, the bounding upper left longitude of the rastered image <br>
-     * "raster_ul_lat" -> Number, the bounding upper left latitude of the rastered image <br>
-     * "raster_lr_lon" -> Number, the bounding lower right longitude of the rastered image <br>
-     * "raster_lr_lat" -> Number, the bounding lower right latitude of the rastered image <br>
-     * "depth"         -> Number, the 1-indexed quadtree depth of the nodes of the rastered image.
-     *                    Can also be interpreted as the length of the numbers in the image
-     *                    string. <br>
-     * "query_success" -> Boolean, whether the query was able to successfully complete. Don't
-     *                    forget to set this to true! <br>
-     * @see #REQUIRED_RASTER_REQUEST_PARAMS
+     * @return A map of results for the front end as specified: <br>
+     * "render_grid"   : String[][], the files to display. <br>
+     * "raster_ul_lon" : Number, the bounding upper left longitude of the rastered image. <br>
+     * "raster_ul_lat" : Number, the bounding upper left latitude of the rastered image. <br>
+     * "raster_lr_lon" : Number, the bounding lower right longitude of the rastered image. <br>
+     * "raster_lr_lat" : Number, the bounding lower right latitude of the rastered image. <br>
+     * "depth"         : Number, the depth of the nodes of the rastered image <br>
+     * "query_success" : Boolean, whether the query was able to successfully complete; don't
+     *                    forget to set this to true on success! <br>
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
         // System.out.println(params);

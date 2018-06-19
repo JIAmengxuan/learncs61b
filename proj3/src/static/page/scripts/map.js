@@ -2,7 +2,7 @@
   * Map project javascript file written for CS61B/CS61BL.
   * This is not an example of good javascript or programming practice.
   * Feel free to improve this front-end for your own personal pleasure.
-  * Authors: Alan Yao (Spring 2016), Colby Guan (Spring 2017)
+  * Authors: Alan Yao (Spring 2016), Colby Guan (Spring 2017), Alexander Hwang (Spring 2018)
   * If using, please credit authors.
   **/
 
@@ -13,6 +13,7 @@ $(function() {
     const $routeStatus = $('#status-route');
     const $loadingStatus = $('#status-loading');
     const $errorStatus = $('#status-error');
+    const $directionsText = $('#directions-text');
     const themeableElements = ['body', '.actions', '.card', '.search', '.ui-autocomplete',
                                 '.status', '.settings', '.clear', '.action-icon'];
     var params = {
@@ -112,10 +113,11 @@ $(function() {
             url: raster_server,
             data: params,
             success: function(data) {
+                console.log(data);
                 if (data.query_success) {
                     $loadingStatus.hide();
                     map.src = 'data:image/png;base64,' + data.b64_encoded_image_data;
-                    console.log('Updating map with image length: ' + 
+                    console.log('Updating map with image length: ' +
                                 data.b64_encoded_image_data.length);
                     ullon_bound = data.raster_ul_lon;
                     ullat_bound = data.raster_ul_lat;
@@ -137,7 +139,7 @@ $(function() {
                         successCallback();
                     }
                 } else {
-                    $loadingStatus.hide();
+                    $loadingstatus.hide();
                 }
             },
             error: function() {
@@ -169,8 +171,14 @@ $(function() {
             async: true,
             url: route_server,
             data: route_params,
-            success: function() {
+            success: function(data) {
+                data = JSON.parse(data);
                 updateImg();
+                if (data.directions_success) {
+                    $directionsText.html(data.directions);
+                } else {
+                    $directionsText.html('No routing directions to display.');
+                }
             },
         });
     }
@@ -401,6 +409,7 @@ $(function() {
             url: clear_route,
             success: function() {
                 dest.style.visibility = 'hidden';
+                $directionsText.html('No routing directions to display.');
                 update();
             },
         });
@@ -420,6 +429,13 @@ $(function() {
     });
     $('.close-settings').click(function() {
         $('.settings-container').removeClass('active');
+    });
+
+    $('.fa-map-signs').click(function() {
+        $('.directions-container').addClass('active');
+    });
+    $('.close-directions').click(function() {
+        $('.directions-container').removeClass('active');
     });
 
     $('body').dblclick(function handler(event) {

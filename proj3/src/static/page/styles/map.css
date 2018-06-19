@@ -66,6 +66,17 @@ body {
   padding: 8px;
   border-radius: 0 0 2px 2px;
 }
+.directions {
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 1.5rem;
+  opacity: 0.75;
+  transition: all 0.3s;
+}
+.directions .card-content {
+  padding: 6px 4px 6px 4px;
+}
 .actions {
   position: fixed;
   left: 0;
@@ -74,10 +85,10 @@ body {
   opacity: 0.75;
   transition: all 0.3s;
 }
-.actions:hover {
+.actions:hover, .directions:hover {
   opacity: 1;
 }
-.actions.active {
+.actions.active, .directions:active {
   opacity: 1;
 }
 .widget {
@@ -126,8 +137,10 @@ body {
   transition: all 0.3s;
   color: #BDBDBD;
 }
+.fa-map-signs, .fa-map-signs:hover {
+  transform: translateX(-10%);
+}
 .fa:hover {
-  transform: scale(1.2);
   color: #616161;
 }
 .action-icon {
@@ -137,6 +150,9 @@ body {
   color: #BDBDBD;
   padding: 2px 4px 6px;
   margin: 0 4px;
+  display:inline-block;
+  text-align: center;
+  vertical-align: bottom;
 }
 .action-icon.fa-2x {
   font-size: 1.85rem;
@@ -145,7 +161,7 @@ body {
   margin-top: 12px;
   float: right;
 }
-.info, .settings {
+.info, .settings, .directions-window {
   cursor: pointer;
   position: relative;
 }
@@ -162,6 +178,16 @@ body {
   border-radius: 6px;
   z-index: 1;
 }
+.directions-window {
+  display: none;
+  width: 450px;
+  padding: 12px;
+  border-radius: 6px;
+  z-index: 1;
+}
+.close-directions {
+  transform: translateY(-25%);
+}
 .settings {
   display: none;
   position: absolute;
@@ -174,9 +200,12 @@ body {
   border-radius: 6px;
   z-index: 1;
 }
-.info.active .info-text, .settings-container.active .settings {
+.info.active .info-text, .settings-container.active .settings, .directions-container.active .directions-window {
   display: block;
   opacity: 1;
+}
+.directions-container.active .action-icon {
+  display: none;
 }
 .info-text:after, .settings:after {
   content: "";
@@ -191,7 +220,7 @@ body {
 .settings:after {
   border-color: transparent transparent #FAFAFA transparent;
 }
-.settings .fa-times-circle-o {
+.settings .fa-times-circle-o, .directions-window .fa-times-circle-o {
   float: right;
   font-size: 1.5rem;
   color: #B71C1C;
@@ -210,6 +239,10 @@ body {
 }
 .settings-title {
   margin: 12px 0 6px;
+}
+.directions-title {
+  text-align: center;
+  margin: 0 0 20px;
 }
 .options-label span {
   margin-left: 4px;

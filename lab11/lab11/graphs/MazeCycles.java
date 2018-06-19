@@ -35,27 +35,36 @@ public class MazeCycles extends MazeExplorer {
         announce();
     }
 
-    // Helper methods go here
     private void detectCycle(int curID) {
+        //We are READY to operate this node.
+        marked[curID] = true;
         announce();
+
+        //End case1: This node is a cycle-neighbor node. Cycle-neighbor here means one of the child node of this node is the cycle intersection.
         for(int child : maze.adj(curID)) {
             if(child != parent[curID] && marked[child]) {
                 isCycle = true;
-            }
-            if(isCycle) {
                 cycleEnd = child;
                 cycleHead = curID;
-                announce();
                 return;
             }
+        }
+
+        //End case2: We have already found a cycle.
+        if(isCycle) {
+            return;
+        }
+
+        //Common case and end case3:
+        for(int child : maze.adj(curID)) {
             if(!marked[child]) {
                 distTo[child] = distTo[curID] + 1;
-                marked[child] = true;
                 parent[child] = curID;
                 detectCycle(child);
             }
-            if(isCycle) return;
+            if(isCycle) return;//Optmize
         }
+        //return;
     }
 }
 

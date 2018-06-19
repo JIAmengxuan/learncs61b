@@ -1,4 +1,5 @@
 package lab14lib;
+import lab14.SineWaveGenerator;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
@@ -24,5 +25,11 @@ public class GeneratorDrawer {
 	    // Show it
 	    new SwingWrapper(chart).displayChart();		
 		
+	}
+	
+	public static void main(String[] args) {
+		Generator generator = new SineWaveGenerator(60);
+		GeneratorDrawer gd = new GeneratorDrawer(generator);
+		gd.draw(65536);
 	}
 }

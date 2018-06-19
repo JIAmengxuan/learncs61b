@@ -48,7 +48,7 @@ public class Board implements WorldState{
      * Returns neighbors of this board.
      * SPOILERZ: This is the answer.
      */
-    //@Josh hug
+    //@author Josh hug
     @Override
     public Iterable<WorldState> neighbors() {
         Queue<WorldState> neighbors = new Queue<>();
