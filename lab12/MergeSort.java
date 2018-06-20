@@ -35,7 +35,13 @@ public class MergeSort {
     private static <Item extends Comparable> Queue<Queue<Item>>
             makeSingleItemQueues(Queue<Item> items) {
         // Your code here!
-        return null;
+        Queue<Queue<Item>> res = new Queue<>();
+        for(Item item : items) {
+            Queue<Item> q = new Queue<>();
+            q.enqueue(item);
+            res.enqueue(q);
+        }
+        return res;
     }
 
     /**
@@ -54,13 +60,53 @@ public class MergeSort {
     private static <Item extends Comparable> Queue<Item> mergeSortedQueues(
             Queue<Item> q1, Queue<Item> q2) {
         // Your code here!
-        return null;
+        Queue<Item> res = new Queue<>();
+        while(!q1.isEmpty() || !q2.isEmpty()) {
+            res.enqueue(MergeSort.getMin(q1, q2));
+        }
+        return res;
     }
 
     /** Returns a Queue that contains the given items sorted from least to greatest. */
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
         // Your code here!
-        return items;
+        if(items.isEmpty()) {
+            Exception e =  new RuntimeException("Can't sort Queue with no items!");
+            e.printStackTrace();
+        }
+
+        Queue<Queue<Item>> singleItemQueues = MergeSort.makeSingleItemQueues(items);
+        while(singleItemQueues.size() > 1) {
+            Queue<Item> qToMerge1 = singleItemQueues.dequeue();
+            Queue<Item> qToMerge2 = singleItemQueues.dequeue();
+            Queue<Item> mergedQueue = MergeSort.mergeSortedQueues(qToMerge1, qToMerge2);
+            singleItemQueues.enqueue(mergedQueue);
+        }
+        return singleItemQueues.dequeue();
+    }
+
+    public static void main(String[] args) {
+        Queue<String> unSorted = new Queue<>();
+
+        unSorted.enqueue("Alice");
+        unSorted.enqueue("Vanessa");
+        unSorted.enqueue("Ethan");
+        unSorted.enqueue("Dog");
+        unSorted.enqueue("Ethan");
+        unSorted.enqueue("Cat");
+        unSorted.enqueue("Whale");
+        unSorted.enqueue("Esther");
+        unSorted.enqueue("Dijkstra");
+
+        System.out.println("Before sorting:");
+        for(String s : unSorted) {
+            System.out.print(s + "  ");
+        }
+
+        System.out.println( '\n' + "After sorting:");
+        for(String s : MergeSort.mergeSort(unSorted)) {
+            System.out.print(s + "  ");
+        }
     }
 }

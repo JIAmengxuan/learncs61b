@@ -7,7 +7,7 @@ public class QuickSort {
      * The items in q2 will be catenated after all of the items in q1.
      */
     private static <Item extends Comparable> Queue<Item> catenate(Queue<Item> q1, Queue<Item> q2) {
-        Queue<Item> catenated = new Queue<Item>();
+        Queue<Item> catenated = new Queue<>();
         for (Item item : q1) {
             catenated.enqueue(item);
         }
@@ -48,12 +48,55 @@ public class QuickSort {
             Queue<Item> unsorted, Item pivot,
             Queue<Item> less, Queue<Item> equal, Queue<Item> greater) {
         // Your code here!
+        for(Item item : unsorted) {
+            if(item.compareTo(pivot) < 0) less.enqueue(item);
+            if(item.compareTo(pivot) > 0) greater.enqueue(item);
+            else  equal.enqueue(item);
+        }
     }
 
     /** Returns a Queue that contains the given items sorted from least to greatest. */
     public static <Item extends Comparable> Queue<Item> quickSort(
             Queue<Item> items) {
         // Your code here!
-        return items;
+        if(items.size() > 1) {
+            Queue<Item> less = new Queue<>();
+            Queue<Item> greater = new Queue<>();
+            Queue<Item> equal = new Queue<>();
+            Item pivot = QuickSort.getRandomItem(items);
+            QuickSort.partition(items, pivot, less, equal, greater);
+            return QuickSort.catenate(QuickSort.catenate(QuickSort.quickSort(less), equal), QuickSort.quickSort(greater));
+        } else {
+            return items;
+        }
+    }
+
+    public static void main(String[] args) {
+        Queue<String> unSorted = new Queue<>();
+
+        unSorted.enqueue("Esther");
+        unSorted.enqueue("Dijkstra");
+        unSorted.enqueue("Vanessa");
+        unSorted.enqueue("Ethan");
+        unSorted.enqueue("Alice");
+        unSorted.enqueue("Esther");
+        unSorted.enqueue("Ethan");
+        unSorted.enqueue("Cat");
+        unSorted.enqueue("Whale");
+        unSorted.enqueue("Esther");
+        unSorted.enqueue("Dog");
+        unSorted.enqueue("@ComputerScience61B");
+        unSorted.enqueue("DistributedSystems");
+        unSorted.enqueue("Esther");
+
+        System.out.println("Before sorting:");
+        for(String s : unSorted) {
+            System.out.print(s + "  ");
+        }
+
+        System.out.println( '\n' + "After sorting:");
+        for(String s : MergeSort.mergeSort(unSorted)) {
+            System.out.print(s + "  ");
+        }
     }
 }
