@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Class for doing Radix sort
  *
@@ -15,9 +17,21 @@ public class RadixSort {
      *
      * @return String[] the sorted array
      */
+
     public static String[] sort(String[] asciis) {
         // TODO: Implement LSD Sort
-        return null;
+        int maxLength = Integer.MIN_VALUE;
+        String[] arrayToLSDsort = new String[asciis.length];
+        System.arraycopy(asciis,0,arrayToLSDsort,0,asciis.length);
+
+        for(String s : asciis) {
+            if(s.length() > maxLength) maxLength = s.length();
+        }
+
+        for(int i = maxLength; i >= 0; i--) {
+            sortHelperLSD(arrayToLSDsort, i);
+        }
+        return arrayToLSDsort;
     }
 
     /**
@@ -27,10 +41,39 @@ public class RadixSort {
      * @param index The position to sort the Strings on.
      */
     private static void sortHelperLSD(String[] asciis, int index) {
-        // Optional LSD helper method for required LSD radix sort
-        return;
+        String[] sorted = new String[asciis.length];
+        int[] counts = new int[256 + 1];
+        int istMax = Integer.MIN_VALUE;
+        //find the max int value of all the chars at index.
+        for(String s : asciis) {
+            int intSi = getCharAt(s, index);
+            counts[intSi]++;
+            if(intSi > istMax) istMax = intSi;
+        }
+        //charAt(index)s' start positions
+        int[] starts = new int[istMax + 1];
+        int sum = 0;
+        for(int j = 0; j < starts.length; j++) {
+            starts[j] = sum;
+            sum += counts[j];
+        }
+        //put unsorted[] Strings to sorted[] according to starts[].
+        for(String s : asciis) {
+            int intChr = getCharAt(s, index);
+            int pos = starts[intChr];
+            sorted[pos] = s;
+            starts[intChr]++;
+        }
+        System.arraycopy(sorted,0,asciis,0,sorted.length);
     }
 
+    private static int getCharAt(String s, int index){
+        if(index > s.length() - 1) return 0;
+        else {
+            int delta = s.length() - index;
+            return ((int) s.charAt(s.length() - delta));
+        }
+    }
     /**
      * MSD radix sort helper function that recursively calls itself to achieve the sorted array.
      * Destructive method that changes the passed in array, asciis.
@@ -44,5 +87,11 @@ public class RadixSort {
     private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
         // Optional MSD helper method for optional MSD radix sort
         return;
+    }
+
+    public static void main(String[] args) {
+        String[] testArr = {"delta", "caddy","allen", "alpha", "apple", "a", "Dijkstra", "bus", "book", "worldCup", "@seu.edu.cn"};
+        String[] result2 = sort(testArr);
+        System.out.println(Arrays.toString(result2));
     }
 }
