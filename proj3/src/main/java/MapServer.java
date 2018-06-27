@@ -43,7 +43,7 @@ public class MapServer {
     /** Route stroke information: typically roads are not more than 5px wide. */
     public static final float ROUTE_STROKE_WIDTH_PX = 5.0f;
     /** Route stroke information: Cyan with half transparency. */
-    public static final Color ROUTE_STROKE_COLOR = new Color(108, 181, 230, 200);
+    public static final Color ROUTE_STROKE_COLOR = new Color(20, 181, 230, 200);
     /** The tile images are in the IMG_ROOT folder. */
     private static final String IMG_ROOT = "../library-sp18/data/proj3_imgs/";
     /**

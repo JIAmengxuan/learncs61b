@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -18,9 +18,30 @@ import java.util.ArrayList;
  * @author Alan Yao, Josh Hug
  */
 public class GraphDB {
+    private Map<Long, vertex> vertexes = new HashMap<>();
+    private Map<Long, way> ways = new HashMap<>();
+
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
+    private class vertex{
+        private double lon, lat;
+        private HashSet<Long> adj;
 
+        private vertex(double longitude, double latitude) {
+            lon = longitude;
+            lat = latitude;
+            adj = new HashSet<>();
+        }
+    }
+
+    private class way {
+        private List<Long> nodes;
+
+        private way(List<Long> ns) {
+            nodes = ns;
+        }
+
+    }
     /**
      * Example constructor shows how to create and start an XML parser.
      * You do not need to modify this constructor, but you're welcome to do so.
@@ -57,7 +78,15 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
-        // TODO: Your code here.
+        LinkedList<Long> vToDel = new LinkedList<>();
+        for(long v : vertexes.keySet()) {
+            if(vertexes.get(v).adj.isEmpty()) {
+                vToDel.add(v);
+            }
+        }
+        for(long v : vToDel) {
+            vertexes.remove(v);
+        }
     }
 
     /**
@@ -66,7 +95,7 @@ public class GraphDB {
      */
     Iterable<Long> vertices() {
         //YOUR CODE HERE, this currently returns only an empty list.
-        return new ArrayList<Long>();
+        return vertexes.keySet();
     }
 
     /**
@@ -75,7 +104,7 @@ public class GraphDB {
      * @return An iterable of the ids of the neighbors of v.
      */
     Iterable<Long> adjacent(long v) {
-        return null;
+        return vertexes.get(v).adj;
     }
 
     /**
@@ -136,7 +165,16 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        return 0;
+        long closest = 0;
+        double minimumDist = Double.MAX_VALUE;
+        for(long v : vertexes.keySet()) {
+            double curDist = distance(lon(v), lat(v), lon, lat);
+            if(curDist < minimumDist) {
+                closest = v;
+                minimumDist = curDist;
+            }
+        }
+        return closest;
     }
 
     /**
@@ -145,7 +183,7 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-        return 0;
+        return vertexes.get(v).lon;
     }
 
     /**
@@ -154,6 +192,41 @@ public class GraphDB {
      * @return The latitude of the vertex.
      */
     double lat(long v) {
-        return 0;
+        return vertexes.get(v).lat;
+    }
+
+    /**
+     * Adds a node to GraphDB.
+     * @param v The id of the node.
+     * @param lon The longitude of the node.
+     * @param lat The latitude of the node.
+     */
+    void addNode(long v, double lon, double lat) {
+        vertexes.put(v, new vertex(lon, lat));
+    }
+
+    /**
+     * Initializes a way and connects all the vertices of this way.
+     * Assumes the number of vertices is greater than 2.
+     * Assumes all nodes have been added to GraphDB.
+     * @param vertices Vertexes in the way to be added.
+     */
+    void connectWay(long wayID, List<Long> vertices) {
+        ways.put(wayID, new way(vertices));
+
+        for(int i = 0; i < vertices.size(); i++) {
+            long vID = vertices.get(i);
+            if(!vertexes.containsKey(vID)) {
+                new RuntimeException("node: " + vID + "is not in the GraphDB").printStackTrace();
+            }
+
+            HashSet<Long> adjacentNodes = vertexes.get(vID).adj;
+            if(i != 0) {
+                adjacentNodes.add(vertices.get(i - 1));
+            }
+            if(i != vertices.size() - 1) {
+                adjacentNodes.add(vertices.get(i + 1));
+            }
+        }
     }
 }

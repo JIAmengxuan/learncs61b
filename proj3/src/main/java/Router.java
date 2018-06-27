@@ -1,5 +1,6 @@
-import java.util.List;
-import java.util.Objects;
+import sun.awt.image.ImageWatched;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +13,57 @@ import java.util.regex.Pattern;
  * down to the priority you use to order your vertices.
  */
 public class Router {
+    GraphDB graph;
+    private routerNode stNode, destNode, goal;
+    private Queue<routerNode> minPQ;
+    private Set<Long> closedSet;
+    private Map<Long, routerNode> openSet;
+
+    private class routerNode{
+        private long ID;
+        private double totalDistToGoal;
+        private double distToStart;
+        private routerNode preNode;
+
+        private routerNode(long id, double distToStart, double totalDist, routerNode pre) {
+            ID = id;
+            this.distToStart = distToStart;
+            totalDistToGoal = totalDist;
+            preNode = pre;
+        }
+    }
+
+    /**
+     * Constructor of Router.
+     * @param g The graph to use.
+     * @param stlon The longitude of the start location.
+     * @param stlat The latitude of the start location.
+     * @param destlon The longitude of the destination location.
+     * @param destlat The latitude of the destination location.
+     */
+    private Router(GraphDB g, double stlon, double stlat, double destlon, double destlat) {
+        graph = g;
+        openSet = new HashMap<>();
+        closedSet = new HashSet<>();
+        minPQ = new PriorityQueue<>(
+                (node1, node2)->(Double.compare(node1.totalDistToGoal, node2.totalDistToGoal))
+        );
+
+        stNode = new routerNode(graph.closest(stlon, stlat), 0, Double.MAX_VALUE, null);
+        stNode.preNode = stNode;
+        destNode = new routerNode(graph.closest(destlon, destlat), Double.MAX_VALUE, 0, null);
+        goal = null;
+    }
+
+    /**
+     * Calculates the heuristic of current node.
+     * @param curNodeId Current node in graph to be calculated.
+     * @return Heuristic distance of this node to goal.
+     */
+    private double heuristic(Long curNodeId) {
+        return graph.distance(curNodeId, destNode.ID);
+    }
+
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -25,7 +77,52 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        Router r = new Router(g, stlon, stlat, destlon, destlat);
+        return r.helpFindSP();
+    }
+
+    /**
+     * Implementation of A * Graph Search algorithm.
+     * @return A list of node id's in the order visited on the shortest path.
+     */
+    private List<Long> helpFindSP() {
+        minPQ.offer(stNode);
+        openSet.put(stNode.ID, stNode);
+
+        while(!openSet.isEmpty()) {
+            routerNode curNode = minPQ.poll();
+            openSet.remove(curNode.ID);
+            closedSet.add(curNode.ID);
+
+            if(curNode.ID == destNode.ID) {
+                goal = curNode;
+                break;
+            }
+
+            for(Long adjId : graph.adjacent(curNode.ID)) {
+                if(closedSet.contains(adjId)) continue;
+
+                double adjNodeDistToSt = graph.distance(adjId, curNode.ID) + curNode.distToStart;
+                routerNode adjNode = new routerNode(adjId, adjNodeDistToSt, adjNodeDistToSt + heuristic(adjId), curNode);
+                if(!openSet.containsKey(adjId)) {
+                    openSet.put(adjId, adjNode);
+                    minPQ.offer(adjNode);
+                } else {
+                    routerNode oldNode = openSet.get(adjId);
+                    if(oldNode.distToStart > graph.distance(adjId, curNode.ID) + curNode.distToStart) {
+                        openSet.put(adjId, adjNode);
+                        minPQ.offer(adjNode);
+                    }
+                }
+            }
+        }
+
+        LinkedList<Long> res = new LinkedList<>();
+        for(routerNode rn = goal; rn.preNode.ID != rn.ID ; rn = rn.preNode) {
+            res.addFirst(rn.ID);
+        }
+        res.addFirst(stNode.ID);
+        return res;
     }
 
     /**
@@ -65,7 +162,7 @@ public class Router {
 
         /** Default name for an unknown way. */
         public static final String UNKNOWN_ROAD = "unknown road";
-        
+
         /** Static initializer. */
         static {
             DIRECTIONS[START] = "Start";
@@ -149,8 +246,8 @@ public class Router {
         public boolean equals(Object o) {
             if (o instanceof NavigationDirection) {
                 return direction == ((NavigationDirection) o).direction
-                    && way.equals(((NavigationDirection) o).way)
-                    && distance == ((NavigationDirection) o).distance;
+                        && way.equals(((NavigationDirection) o).way)
+                        && distance == ((NavigationDirection) o).distance;
             }
             return false;
         }
@@ -160,4 +257,5 @@ public class Router {
             return Objects.hash(direction, way, distance);
         }
     }
+
 }
