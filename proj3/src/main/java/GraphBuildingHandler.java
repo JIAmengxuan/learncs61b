@@ -37,7 +37,10 @@ public class GraphBuildingHandler extends DefaultHandler {
     private String activeState = "";
     private final GraphDB g;
     private long curWayId;
+    private long curNodeId;
     private List<Long> nodesOfCurWay;
+    private String curWayName;
+    private boolean isValidWay = false;
 
     /**
      * Create a new GraphBuildingHandler.
@@ -72,7 +75,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             double lon = Double.valueOf(attributes.getValue("lon"));
             double lat = Double.valueOf(attributes.getValue("lat"));
             g.addNode(id, lon, lat);
-            /* TODO Use the above information to save a "node" to somewhere. */
+            curNodeId = id;
             /* Hint: A graph-like structure would be nice. */
 
         } else if (qName.equals("way")) {
@@ -85,7 +88,6 @@ public class GraphBuildingHandler extends DefaultHandler {
         } else if (activeState.equals("way") && qName.equals("nd")) {
             /* While looking at a way, we found a <nd...> tag. */
             //System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
-            /* TODO Use the above id to make "possible" connections between the nodes in this way */
             nodesOfCurWay.add(Long.valueOf(attributes.getValue("ref")));
             /* Hint1: It would be useful to remember what was the last node in this way. */
             /* Hint2: Not all ways are valid. So, directly connecting the nodes here would be
@@ -101,26 +103,20 @@ public class GraphBuildingHandler extends DefaultHandler {
                 //System.out.println("Max Speed: " + v);
                 /* TODO set the max speed of the "current way" here. */
             } else if (k.equals("highway")) {
-                //System.out.println("Highway type: " + v);
-                /* TODO Figure out whether this way and its connections are valid. */
                 if(ALLOWED_HIGHWAY_TYPES.contains(v)) {
-                    g.connectWay(curWayId, nodesOfCurWay);
-                    curWayId = 0;
-                    nodesOfCurWay = null;
+                    isValidWay = true;
                 }
                 /* Hint: Setting a "flag" is good enough! */
             } else if (k.equals("name")) {
-                //System.out.println("Way Name: " + v);
+                curWayName = v;
             }
-            //System.out.println("Tag with k=" + k + ", v=" + v + ".");
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
             /* While looking at a node, we found a <tag...> with k="name". */
-            /* TODO Create a location. */
+            g.setNodeName(curNodeId, attributes.getValue("v"));
             /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
-            //System.out.println("Node's name: " + attributes.getValue("v"));
         }
     }
 
@@ -142,6 +138,12 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* Hint1: If you have stored the possible connections for this way, here's your
             chance to actually connect the nodes together if the way is valid. */
             //System.out.println("Finishing a way...");
+            if(isValidWay) {
+                g.connectWay(curWayId, nodesOfCurWay);
+                g.setWayName(curWayId, curWayName);
+                curWayId = 0;
+                isValidWay = false;
+            }
         }
     }
 

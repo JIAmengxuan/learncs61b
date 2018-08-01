@@ -169,6 +169,8 @@ public class MapServer {
             response.redirect("/map.html", 301);
             return true;
         });
+
+        get("/favicon.ico", (request, response) -> true);
     }
 
     /**

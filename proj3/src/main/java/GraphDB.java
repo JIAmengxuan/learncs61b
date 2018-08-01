@@ -26,8 +26,12 @@ public class GraphDB {
     private class vertex{
         private double lon, lat;
         private HashSet<Long> adj;
+        private String name;
+        private long wayId;
 
         private vertex(double longitude, double latitude) {
+            name = null;
+            wayId = Long.MAX_VALUE;
             lon = longitude;
             lat = latitude;
             adj = new HashSet<>();
@@ -36,6 +40,7 @@ public class GraphDB {
 
     private class way {
         private List<Long> nodes;
+        private String name;
 
         private way(List<Long> ns) {
             nodes = ns;
@@ -106,6 +111,26 @@ public class GraphDB {
     Iterable<Long> adjacent(long v) {
         return vertexes.get(v).adj;
     }
+
+    void setNodeName(long v, String name){
+        vertexes.get(v).name = name;
+    }
+
+    void setWayName(long w, String name) {
+        ways.get(w).name = name;
+    }
+
+    boolean isOnTheSameWay(long node1, long node2) {
+        String way1 = findbelongWay(node1);
+        String way2 = findbelongWay(node2);
+        return !way1.equals("unknown road") && way1.equals(way2);
+    }
+
+    String findbelongWay(long v) {
+        System.out.println(Long.toString(vertexes.get(v).wayId));
+        return ways.get(vertexes.get(v).wayId).name == null ? "unknown road" : ways.get(vertexes.get(v).wayId).name;
+    }
+
 
     /**
      * Returns the great-circle distance between vertices v and w in miles.
@@ -219,6 +244,8 @@ public class GraphDB {
             if(!vertexes.containsKey(vID)) {
                 new RuntimeException("node: " + vID + "is not in the GraphDB").printStackTrace();
             }
+
+            vertexes.get(vID).wayId = wayID;
 
             HashSet<Long> adjacentNodes = vertexes.get(vID).adj;
             if(i != 0) {

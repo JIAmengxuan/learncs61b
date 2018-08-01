@@ -134,8 +134,62 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+        LinkedList<NavigationDirection> res = new LinkedList<>();
+
+        double lengthBeforeChangeWay = 0;
+        boolean start = true;
+        for(int i = 0; i < route.size() -1 ; i++) {
+            if(g.isOnTheSameWay(route.get(i), route.get(i + 1))) {
+                lengthBeforeChangeWay += g.distance(route.get(i), route.get(i + 1));
+            } else {
+                lengthBeforeChangeWay += g.distance(route.get(i), route.get(i + 1));
+                System.out.println(g.findbelongWay(route.get(i)));
+                System.out.println(g.findbelongWay(route.get(i + 1)));
+
+                if(start) {
+                    res.add(NavigationDirection.fromString("Start on " + g.findbelongWay(route.get(i)) + " and continue for "
+                            + Double.toString(lengthBeforeChangeWay) + " miles."));
+                    start = false;
+                    lengthBeforeChangeWay = 0;
+                    continue;
+                }
+
+                double angle = g.bearing(route.get(i - 1), route.get(i));
+                if(Math.abs(angle) < 15) {
+                    res.add(NavigationDirection.fromString("Go straight on " + g.findbelongWay(route.get(i)) + " and continue for "
+                            + Double.toString(lengthBeforeChangeWay) + " miles."));
+                } else if(Math.abs(angle) >= 15 && Math.abs(angle) < 30) {
+                    if(angle > 0) {
+                        res.add(NavigationDirection.fromString("Slight right on " + g.findbelongWay(route.get(i)) + " and continue for "
+                                + Double.toString(lengthBeforeChangeWay) + " miles."));
+                    } else {
+                        res.add(NavigationDirection.fromString("Slight left on " + g.findbelongWay(route.get(i)) + " and continue for "
+                                + Double.toString(lengthBeforeChangeWay) + " miles."));
+                    }
+                } else if(Math.abs(angle) >= 30 && Math.abs(angle) < 100) {
+                    if (angle > 0) {
+                        res.add(NavigationDirection.fromString("Turn right on " + g.findbelongWay(route.get(i)) + " and continue for "
+                                + Double.toString(lengthBeforeChangeWay) + " miles."));
+                    } else {
+                        res.add(NavigationDirection.fromString("Turn left on " + g.findbelongWay(route.get(i)) + " and continue for "
+                                + Double.toString(lengthBeforeChangeWay) + " miles."));
+                    }
+                } else {
+                    if (angle > 0) {
+                        res.add(NavigationDirection.fromString("Sharp right on " + g.findbelongWay(route.get(i)) + " and continue for "
+                                + Double.toString(lengthBeforeChangeWay) + " miles."));
+                    } else {
+                        res.add(NavigationDirection.fromString("Sharp left on " + g.findbelongWay(route.get(i)) + " and continue for "
+                                + Double.toString(lengthBeforeChangeWay) + " miles."));
+                    }
+                }
+                lengthBeforeChangeWay = 0;
+            }
+
+        }
+        return res;
     }
+
 
 
     /**
